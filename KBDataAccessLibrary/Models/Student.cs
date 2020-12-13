@@ -12,7 +12,7 @@ namespace KBDataAccessLibrary.Models
         public DateTime BirthDate { get; set; }
         public string Belt { get; set; }
         public AgeCategory AgeCategory { get; set; }
-        public Group GroupId { get; set; }
+        public Group Group { get; set; }
         public List<Membership> Memberships { get; set; }
     }
 }

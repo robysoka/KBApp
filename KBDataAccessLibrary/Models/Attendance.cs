@@ -6,6 +6,7 @@ namespace KBDataAccessLibrary.Models
 {
     public class Attendance
     {
+        public int AttendanceId { get; set; }
         public Student Student { get; set; }
         public Class Class { get; set; }
     }
