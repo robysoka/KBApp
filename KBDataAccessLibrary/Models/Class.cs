@@ -20,6 +20,6 @@ namespace KBDataAccessLibrary.Models
 
         [Required]
         public Group Group { get; set; }
-        public List<Instructor> Instructors { get; set; }
+        public List<Instructor> Instructors { get; set; } = new List<Instructor>();
     }
 }

@@ -19,6 +19,6 @@ namespace KBDataAccessLibrary.Models
         [MaxLength(100)]
         [Column(TypeName = "varchar(100)")]
         public string FirstName { get; set; }
-        public List<Class> Classes { get; set; }
+        public List<Class> Classes { get; set; } = new List<Class>();
     }
 }
