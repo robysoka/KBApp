@@ -14,7 +14,7 @@ namespace KBDataAccessLibrary.Models
         [MaxLength(7)]
         [Column(TypeName ="varchar(7)")]
         public string CategoryName { get; set; }
-        public List<Student> Students { get; set; } = new List<Student>();
+        public List<Student> Students { get; set; } 
 
     }
 }

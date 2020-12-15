@@ -17,6 +17,6 @@ namespace KBDataAccessLibrary.Models
         
         [Required]
         public AgeCategory AgeCategory { get; set; }
-        public List<Student> Students { get; set; } = new List<Student>();
+        public List<Student> Students { get; set; }
     }
 }

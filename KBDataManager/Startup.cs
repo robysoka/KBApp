@@ -12,7 +12,9 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace KBDataManager
 {
@@ -33,6 +35,7 @@ namespace KBDataManager
                 options.UseSqlServer(Configuration.GetConnectionString("Default"));
             });
             services.AddControllers();
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "KBDataManager", Version = "v1" });
