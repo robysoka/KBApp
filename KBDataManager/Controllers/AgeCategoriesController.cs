@@ -9,6 +9,7 @@ using KBDataAccessLibrary.DataAccess;
 using KBDataAccessLibrary.Models;
 using KBDataManager.ViewModels;
 using AutoMapper;
+using KBDataAccessLibrary.Repository;
 
 namespace KBDataManager.Controllers
 {
@@ -17,20 +18,22 @@ namespace KBDataManager.Controllers
     public class AgeCategoriesController : ControllerBase
     {
         private readonly KBContext _context;
-        private IMapper _mapper;
+        private readonly IUnitOfWork _repository;
+        private readonly IMapper _mapper;
 
-        public AgeCategoriesController(KBContext context, IMapper mapper)
+        public AgeCategoriesController(KBContext context, IUnitOfWork repository, IMapper mapper)
         {
             _context = context;
+            _repository = repository;
             _mapper = mapper;
             
         }
 
         // GET: api/AgeCategories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AgeCategory>>> GetAgeCategories()
+        public ActionResult<IEnumerable<AgeCategory>> GetAgeCategories()
         {
-            return await _context.AgeCategories.ToListAsync();
+           return Ok(_mapper.Map<IEnumerable<AgeCategory>, IEnumerable<AgeCategoryViewModel>>(_repository.AgeCategories.GetAll()));
         }
 
         // GET: api/AgeCategories/5

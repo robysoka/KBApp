@@ -8,7 +8,8 @@ namespace KBDataAccessLibrary.Repository
 {
     public class AgeCategoryRepository : Repository<AgeCategory>, IAgeCategoryRepository
     {
-        public AgeCategoryRepository(KBContext context) : base(context)
+        public AgeCategoryRepository(KBContext context) : 
+            base(context)
         {
         }
 

@@ -13,10 +13,7 @@ namespace KBDataManager.Mapping
         public Mapper()
         {
             CreateMap<AgeCategory, AgeCategoryViewModel>()
-            .ReverseMap(); // for OrderViewModel => Order
-
-            //CreateMap<OrderItem, OrderItemViewModel>()
-            //        .ReverseMap();
+                .ReverseMap();
         }
     }
 }
