@@ -7,6 +7,7 @@ namespace KBDataAccessLibrary.Repository
 {
     public interface IRepository<TEntity> where TEntity : class
     {
+        //TODO: Ar trebui sa implementez si metode de update in Repository Pattern?
         //GET
         TEntity Get(int id);
         IEnumerable<TEntity> GetAll();

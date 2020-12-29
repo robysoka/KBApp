@@ -29,6 +29,8 @@ namespace KBDataManager.Controllers
             
         }
 
+        //TODO: Repository Pattern si functii async?
+
         // GET: api/AgeCategories
         [HttpGet]
         public ActionResult<IEnumerable<AgeCategory>> GetAgeCategories()
@@ -53,20 +55,20 @@ namespace KBDataManager.Controllers
         // PUT: api/AgeCategories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAgeCategory(int id, AgeCategory ageCategory)
+        public IActionResult PutAgeCategory(int id, AgeCategoryViewModel ageCategoryViewModel)
         {
-            if (id != ageCategory.AgeCategoryId)
+            if (id!=ageCategoryViewModel.AgeCategoryId)
             {
-                return BadRequest();
+                return BadRequest("Request URL Id does not match the Body Object Id ");
             }
-
+            var ageCategory = _mapper.Map<AgeCategoryViewModel, AgeCategory>(ageCategoryViewModel);
             _context.Entry(ageCategory).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException e)
             {
                 if (!AgeCategoryExists(id))
                 {
@@ -74,21 +76,22 @@ namespace KBDataManager.Controllers
                 }
                 else
                 {
-                    throw;
+                    return BadRequest(e);
                 }
             }
-
-            return NoContent();
+            
+            //TODO: Ce este mai bine sa returnez cu Response Code-ul?
+            return Ok(ageCategoryViewModel);
         }
 
         // POST: api/AgeCategories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AgeCategory>> PostAgeCategory([FromBody]AgeCategoryViewModel ageCategoryViewModel)
+        public ActionResult<AgeCategory> PostAgeCategory([FromBody]AgeCategoryViewModel ageCategoryViewModel)
         {
             var newAgeCategory = _mapper.Map<AgeCategoryViewModel, AgeCategory>(ageCategoryViewModel);
-            _context.AgeCategories.Add(newAgeCategory);
-            await _context.SaveChangesAsync();
+            _repository.AgeCategories.Add(newAgeCategory);
+            _repository.Complete();
 
             return CreatedAtAction("GetAgeCategory", new { id = ageCategoryViewModel.AgeCategoryId }, ageCategoryViewModel);
         }
