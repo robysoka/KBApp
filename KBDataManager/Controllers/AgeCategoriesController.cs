@@ -10,6 +10,7 @@ using KBDataAccessLibrary.Models;
 using KBDataManager.ViewModels;
 using AutoMapper;
 using KBDataAccessLibrary.Repository;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace KBDataManager.Controllers
 {
@@ -17,19 +18,14 @@ namespace KBDataManager.Controllers
     [ApiController]
     public class AgeCategoriesController : ControllerBase
     {
-        private readonly KBContext _context;
         private readonly IUnitOfWork _repository;
         private readonly IMapper _mapper;
 
-        public AgeCategoriesController(KBContext context, IUnitOfWork repository, IMapper mapper)
+        public AgeCategoriesController(IUnitOfWork repository, IMapper mapper)
         {
-            _context = context;
             _repository = repository;
             _mapper = mapper;
-            
         }
-
-        //TODO: Repository Pattern si functii async?
 
         // GET: api/AgeCategories
         /// <summary>
@@ -38,16 +34,22 @@ namespace KBDataManager.Controllers
         /// <returns>All Age Categories</returns>
         /// <response code="200"> Returns All Age Categories</response>
         [HttpGet]
-        public ActionResult<IEnumerable<AgeCategory>> GetAgeCategories()
+        public async Task<ActionResult<IEnumerable<AgeCategory>>> GetAgeCategories()
         {
-           return Ok(_mapper.Map<IEnumerable<AgeCategory>, IEnumerable<AgeCategoryViewModel>>(_repository.AgeCategories.GetAll()));
+            return Ok(_mapper.Map<IEnumerable<AgeCategory>, IEnumerable<AgeCategoryViewModel>>(await _repository.AgeCategories.GetAll()));
         }
 
         // GET: api/AgeCategories/5
+        /// <summary>
+        /// Get Age category by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<AgeCategory>> GetAgeCategory(int id)
         {
-            var ageCategory = await _context.AgeCategories.FindAsync(id);
+            var ageCategory = await _repository.AgeCategories.Get(id);
+            var newAgeCategory = _mapper.Map<AgeCategory, AgeCategoryViewModel>(ageCategory);
 
             if (ageCategory == null)
             {
@@ -65,13 +67,13 @@ namespace KBDataManager.Controllers
         /// <param name="id"></param>
         /// <param name="ageCategoryViewModel"></param>
         /// <response code="200"> The modified Age Category </response>
-        /// <response code="500"> Request URL Id does not match the Body Object Id </response>
+        /// <response code="400"> Request URL Id does not match the Body Object Id </response>
         /// <response code="404"> Not Found </response>
         /// <returns>The modified Age Category</returns>
         [HttpPut("{id}")]
-        public IActionResult PutAgeCategory(int id,[FromBody]AgeCategoryViewModel ageCategoryViewModel)
+        public async Task<IActionResult> PutAgeCategory(int id, [FromBody] AgeCategoryViewModel ageCategoryViewModel)
         {
-            if (id!=ageCategoryViewModel.AgeCategoryId)
+            if (id != ageCategoryViewModel.AgeCategoryId)
             {
                 return BadRequest("Request URL Id does not match the Body Object Id ");
             }
@@ -79,6 +81,7 @@ namespace KBDataManager.Controllers
             try
             {
                 _repository.AgeCategories.Update(ageCategory);
+                await _repository.Complete();
             }
             catch (DbUpdateConcurrencyException e)
             {
@@ -91,7 +94,7 @@ namespace KBDataManager.Controllers
                     return BadRequest(e);
                 }
             }
-            
+
             //TODO: Ce este mai bine sa returnez cu Response Code-ul?
             return Ok(ageCategoryViewModel);
         }
@@ -101,39 +104,50 @@ namespace KBDataManager.Controllers
         /// <summary>
         /// Create new Age Category
         /// </summary>
+        /// <remarks>
+        /// The ID should remain 0 in body request because it's auto-incrementing
+        /// </remarks>
         /// <param name="ageCategoryViewModel"></param>
         /// <response code="201"> Created new Age Category </response>
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<AgeCategory> PostAgeCategory([FromBody]AgeCategoryViewModel ageCategoryViewModel)
+        public async Task<ActionResult<AgeCategory>> PostAgeCategory([FromBody] AgeCategoryViewModel ageCategoryViewModel)
         {
             var newAgeCategory = _mapper.Map<AgeCategoryViewModel, AgeCategory>(ageCategoryViewModel);
             _repository.AgeCategories.Add(newAgeCategory);
-            _repository.Complete();
+            await _repository.Complete();
 
-            return CreatedAtAction("GetAgeCategory", new { id = ageCategoryViewModel.AgeCategoryId }, ageCategoryViewModel);
+            return CreatedAtAction("GetAgeCategory", new { id = ageCategoryViewModel.AgeCategoryId }, ageCategoryViewModel.CategoryName);
         }
 
         // DELETE: api/AgeCategories/5
+        /// <summary>
+        /// Delete an AgeCategory
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteAgeCategory(int id)
         {
-            var ageCategory = await _context.AgeCategories.FindAsync(id);
+            var ageCategory = await _repository.AgeCategories.Get(id);
             if (ageCategory == null)
             {
                 return NotFound();
             }
 
-            _context.AgeCategories.Remove(ageCategory);
-            await _context.SaveChangesAsync();
+            _repository.AgeCategories.Remove(ageCategory);
+            await _repository.Complete();
 
             return NoContent();
         }
 
+        //TODO: CHECK EXISTENCE
         private bool AgeCategoryExists(int id)
         {
-            return _context.AgeCategories.Any(e => e.AgeCategoryId == id);
+            return true;
         }
     }
 }

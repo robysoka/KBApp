@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace KBDataAccessLibrary.Repository
 {
@@ -16,9 +17,9 @@ namespace KBDataAccessLibrary.Repository
 
         public IAgeCategoryRepository AgeCategories { get; private set; }
 
-        public int Complete()
+        public async Task<int> Complete()
         {
-            return _context.SaveChanges();
+            return await _context.SaveChangesAsync();
         }
 
         public void Dispose()

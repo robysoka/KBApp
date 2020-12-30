@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace KBDataAccessLibrary.Repository
 {
@@ -16,19 +17,19 @@ namespace KBDataAccessLibrary.Repository
         }
 
         //GET
-        public TEntity Get(int id)
+        public async Task<TEntity> Get(int id)
         {
-            return Context.Set<TEntity>().Find(id);
+            return await Context.Set<TEntity>().FindAsync(id);
         }
 
-        public IEnumerable<TEntity> GetAll()
+        public async Task<IEnumerable<TEntity>> GetAll()
         {
-            return Context.Set<TEntity>().ToList();
+            return await Context.Set<TEntity>().ToListAsync();
         }
 
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        public async  Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
         {
-            return Context.Set<TEntity>().Where(predicate);
+            return await Context.Set<TEntity>().Where(predicate).ToListAsync();
         }
 
         //ADD
@@ -46,7 +47,6 @@ namespace KBDataAccessLibrary.Repository
         public void Update(TEntity entity )
         {
             Context.Entry(entity).State = EntityState.Modified;
-            Context.SaveChanges();
         }
 
 
@@ -60,6 +60,5 @@ namespace KBDataAccessLibrary.Repository
         {
             Context.Set<TEntity>().RemoveRange(entities);
         }
-
     }
 }

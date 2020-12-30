@@ -8,11 +8,10 @@ namespace KBDataAccessLibrary.Repository
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        //TODO: Ar trebui sa implementez si metode de update in Repository Pattern?
         //GET
-        TEntity Get(int id);
-        IEnumerable<TEntity> GetAll();
-        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> Get(int id);
+        Task<IEnumerable<TEntity>> GetAll();
+        Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate);
 
         //ADD
         void Add(TEntity entity);
