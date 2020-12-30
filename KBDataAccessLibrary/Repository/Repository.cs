@@ -42,6 +42,14 @@ namespace KBDataAccessLibrary.Repository
             Context.Set<TEntity>().AddRange(entities);
         }
 
+        //UPDATE
+        public void Update(TEntity entity )
+        {
+            Context.Entry(entity).State = EntityState.Modified;
+            Context.SaveChanges();
+        }
+
+
         //REMOVE
         public void Remove(TEntity entity)
         {
@@ -52,5 +60,6 @@ namespace KBDataAccessLibrary.Repository
         {
             Context.Set<TEntity>().RemoveRange(entities);
         }
+
     }
 }

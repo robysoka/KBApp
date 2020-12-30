@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace KBDataAccessLibrary.Repository
 {
@@ -16,6 +17,9 @@ namespace KBDataAccessLibrary.Repository
         //ADD
         void Add(TEntity entity);
         void AddRange(IEnumerable<TEntity> entities); //Add list of objects
+
+        //UPDATE
+        void Update(TEntity entity);
 
         //REMOVE
         void Remove(TEntity entity);
