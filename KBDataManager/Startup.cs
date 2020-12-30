@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using KBDataAccessLibrary.Repository;
+using System.IO;
 
 namespace KBDataManager
 {
@@ -41,6 +42,9 @@ namespace KBDataManager
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "KBDataManager", Version = "v1" });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
