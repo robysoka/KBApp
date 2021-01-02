@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using KBDataAccessLibrary.DataAccess;
 using KBDataAccessLibrary.Models;
 using KBDataManager.ViewModels;
 using AutoMapper;
 using KBDataAccessLibrary.Repository;
-using Swashbuckle.AspNetCore.Filters;
 
 namespace KBDataManager.Controllers
 {
@@ -34,6 +30,7 @@ namespace KBDataManager.Controllers
         /// <returns>All Age Categories</returns>
         /// <response code="200"> Returns All Age Categories</response>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<AgeCategory>>> GetAgeCategories()
         {
             return Ok(_mapper.Map<IEnumerable<AgeCategory>, IEnumerable<AgeCategoryViewModel>>(await _repository.AgeCategories.GetAll()));
@@ -46,17 +43,17 @@ namespace KBDataManager.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AgeCategory>> GetAgeCategory(int id)
         {
             var ageCategory = await _repository.AgeCategories.Get(id);
-            var newAgeCategory = _mapper.Map<AgeCategory, AgeCategoryViewModel>(ageCategory);
-
             if (ageCategory == null)
             {
                 return NotFound();
             }
 
-            return ageCategory;
+            return Ok(_mapper.Map<AgeCategory, AgeCategoryViewModel>(ageCategory));
         }
 
         // PUT: api/AgeCategories/5
@@ -71,6 +68,8 @@ namespace KBDataManager.Controllers
         /// <response code="404"> Not Found </response>
         /// <returns>The modified Age Category</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutAgeCategory(int id, [FromBody] AgeCategoryViewModel ageCategoryViewModel)
         {
             if (id != ageCategoryViewModel.AgeCategoryId)
@@ -85,14 +84,7 @@ namespace KBDataManager.Controllers
             }
             catch (DbUpdateConcurrencyException e)
             {
-                if (!AgeCategoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    return BadRequest(e);
-                }
+                return BadRequest(e);
             }
 
             //TODO: Ce este mai bine sa returnez cu Response Code-ul?
@@ -142,12 +134,6 @@ namespace KBDataManager.Controllers
             await _repository.Complete();
 
             return NoContent();
-        }
-
-        //TODO: CHECK EXISTENCE
-        private bool AgeCategoryExists(int id)
-        {
-            return true;
         }
     }
 }
