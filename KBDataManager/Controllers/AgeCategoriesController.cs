@@ -104,11 +104,19 @@ namespace KBDataManager.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AgeCategory>> PostAgeCategory([FromBody] AgeCategoryViewModel ageCategoryViewModel)
         {
-            var newAgeCategory = _mapper.Map<AgeCategoryViewModel, AgeCategory>(ageCategoryViewModel);
-            _repository.AgeCategories.Add(newAgeCategory);
-            await _repository.Complete();
+            try
+            {
+                var newAgeCategory = _mapper.Map<AgeCategoryViewModel, AgeCategory>(ageCategoryViewModel);
+                _repository.AgeCategories.Add(newAgeCategory);
+                await _repository.Complete();
+            }
+            catch (DbUpdateException e)
+            {
+                return BadRequest(e);
+            }
 
             return CreatedAtAction("GetAgeCategory", new { id = ageCategoryViewModel.AgeCategoryId }, ageCategoryViewModel.CategoryName);
         }
