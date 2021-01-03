@@ -7,6 +7,7 @@ using KBDataAccessLibrary.Models;
 using KBDataManager.ViewModels;
 using AutoMapper;
 using KBDataAccessLibrary.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KBDataManager.Controllers
 {
@@ -30,6 +31,7 @@ namespace KBDataManager.Controllers
         /// <returns>All Age Categories</returns>
         /// <response code="200"> Returns All Age Categories</response>
         [HttpGet]
+        [Authorize(Roles = "User")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<AgeCategory>>> GetAgeCategories()
         {
