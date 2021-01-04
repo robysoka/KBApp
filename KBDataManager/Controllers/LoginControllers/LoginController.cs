@@ -24,21 +24,26 @@ namespace KBDataManager.Controllers.LoginControllers
         }
 
         [HttpPost , Route("login")]
-        public IActionResult Login([FromBody] User user)
+        public IActionResult Login([FromBody] UserInputModel userInputModel)
         {
-            if (user == null)
+            if (userInputModel == null)
             {
                 return BadRequest("Invalid client request");
             }
-            if (user.Username == "johndoe" && user.Password == "def@123")
+            var user = GetUser(userInputModel.Username);
+            if(user == null)
+            {
+                return Unauthorized("There's no account with the specified username. Try again!");
+            }
+            if (userInputModel.Password == user.Password)
             {
                 var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("IsSecretKeyBroTakeCare"));
                 var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, "User")
+                    new Claim(ClaimTypes.Name, userInputModel.Username),
+                    new Claim(ClaimTypes.Role, user.Role)
                 };
 
                 var tokenOptions = new JwtSecurityToken(
@@ -53,13 +58,13 @@ namespace KBDataManager.Controllers.LoginControllers
             }
             else
             {
-                return Unauthorized();
+                return Unauthorized("Password is wrong");
             }
         }
 
-        //private Login CheckExistence(string username)
-        //{
-        //    return _context.Login.Any(e => e.Username == username);
-        //}
+        private User GetUser(string Username)
+        {
+            return _context.Users.Find(Username);
+        }
     }
 }
