@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KBDataAccessLibrary.Models.LoginModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,6 +31,10 @@ namespace KBDataAccessLibrary.Models
 
         [Required]
         public Group Group { get; set; }
+
+        [Required]
+        public User User { get; set; }
+
         public List<Membership> Memberships { get; set; }
     }
 }

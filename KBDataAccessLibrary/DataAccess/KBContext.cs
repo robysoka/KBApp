@@ -1,4 +1,5 @@
 ﻿using KBDataAccessLibrary.Models;
+using KBDataAccessLibrary.Models.LoginModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,6 @@ namespace KBDataAccessLibrary.DataAccess
         public DbSet<Instructor> Instructors { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

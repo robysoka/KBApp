@@ -1,4 +1,5 @@
-﻿using KBDataAccessLibrary.Models.LoginModels;
+﻿using KBDataAccessLibrary.DataAccess;
+using KBDataAccessLibrary.Models.LoginModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -16,8 +17,14 @@ namespace KBDataManager.Controllers.LoginControllers
     [ApiController]
     public class LoginController : ControllerBase
     {
+        private readonly KBContext _context;
+        public LoginController(KBContext context)
+        {
+            _context = context;
+        }
+
         [HttpPost , Route("login")]
-        public IActionResult Login([FromBody] Login user)
+        public IActionResult Login([FromBody] User user)
         {
             if (user == null)
             {
@@ -49,5 +56,10 @@ namespace KBDataManager.Controllers.LoginControllers
                 return Unauthorized();
             }
         }
+
+        //private Login CheckExistence(string username)
+        //{
+        //    return _context.Login.Any(e => e.Username == username);
+        //}
     }
 }
