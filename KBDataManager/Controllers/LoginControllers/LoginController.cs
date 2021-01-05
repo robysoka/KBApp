@@ -30,11 +30,13 @@ namespace KBDataManager.Controllers.LoginControllers
             {
                 return BadRequest("Invalid client request");
             }
+
             var user = GetUser(userInputModel.Username);
             if(user == null)
             {
                 return Unauthorized("There's no account with the specified username. Try again!");
             }
+
             if (userInputModel.Password == user.Password)
             {
                 var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("IsSecretKeyBroTakeCare"));

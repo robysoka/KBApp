@@ -20,6 +20,7 @@ using System.IO;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using KBDataManager.EmailService;
 
 namespace KBDataManager
 {
@@ -42,6 +43,13 @@ namespace KBDataManager
             services.AddControllers();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IEmailSender, EmailSender>();
+
+            //Email Service
+            var emailConfig = Configuration.
+                .GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+            services.AddSingleton(emailConfig);
 
             //Add CORS policy
             services.AddCors(options =>
@@ -68,9 +76,9 @@ namespace KBDataManager
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer= "https://localhost:44386",
-                    ValidAudience= "https://localhost:44386",
-                    IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes("IsSecretKeyBroTakeCare"))
+                    ValidIssuer = "https://localhost:44386",
+                    ValidAudience = "https://localhost:44386",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("IsSecretKeyBroTakeCare"))
                 };
             });
 
