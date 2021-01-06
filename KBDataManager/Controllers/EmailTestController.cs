@@ -19,7 +19,7 @@ namespace KBDataManager.Controllers
         }
 
         [HttpGet]
-        public ActionResult Get()
+        public IActionResult Get()
         {
             var message = new Message(new string[] { "robert.hadadea@gmail.com","radu.turtoi@yahoo.com" }, "Test email", "Va saluta Sensei");
             _emailSender.SendEmail(message);

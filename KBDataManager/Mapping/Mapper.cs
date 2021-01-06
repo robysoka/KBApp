@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using KBDataAccessLibrary.Models;
+using KBDataAccessLibrary.Models.RegisterModels;
 using KBDataManager.ViewModels;
 using System;
 using System.Collections.Generic;

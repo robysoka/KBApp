@@ -1,5 +1,8 @@
-﻿using KBDataAccessLibrary.DataAccess;
+﻿using AutoMapper;
+using KBDataAccessLibrary.DataAccess;
 using KBDataAccessLibrary.Models.LoginModels;
+using KBDataAccessLibrary.Models.RegisterModels;
+using KBDataManager.EmailService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -18,12 +21,16 @@ namespace KBDataManager.Controllers.LoginControllers
     public class LoginController : ControllerBase
     {
         private readonly KBContext _context;
-        public LoginController(KBContext context)
+        private readonly IEmailSender _emailSender;
+        public LoginController(KBContext context, IEmailSender emailSender)
         {
             _context = context;
+            _emailSender = emailSender;
         }
 
-        [HttpPost , Route("login")]
+
+        //LOGIN
+        [HttpPost, Route("login")]
         public IActionResult Login([FromBody] UserInputModel userInputModel)
         {
             if (userInputModel == null)
@@ -32,7 +39,7 @@ namespace KBDataManager.Controllers.LoginControllers
             }
 
             var user = GetUser(userInputModel.Username);
-            if(user == null)
+            if (user == null)
             {
                 return Unauthorized("There's no account with the specified username. Try again!");
             }
@@ -67,6 +74,56 @@ namespace KBDataManager.Controllers.LoginControllers
         private User GetUser(string Username)
         {
             return _context.Users.Find(Username);
+        }
+
+
+        //REGISTER-INVITATION
+        [HttpPost, Route("invitation")]
+        public IActionResult PostInvitation([FromBody] InvitationInputModel invitation)
+        {
+            Invitation newInvitation = new Invitation();
+            var guid = Guid.NewGuid();
+            var expireDate = DateTime.Now.AddDays(3);
+
+            try
+            {
+                newInvitation.InvitationString = guid;
+                newInvitation.Belt = invitation.Belt;
+                newInvitation.Email = invitation.Email;
+
+                newInvitation.AgeCategory = _context.AgeCategories.Find(invitation.AgeCategoryId);
+                if (newInvitation.AgeCategory == null)
+                {
+                    return BadRequest();
+                }
+
+                newInvitation.Group = _context.Groups.Find(invitation.GroupId);
+                if (newInvitation.Group == null)
+                {
+                    return BadRequest();
+                }
+
+                newInvitation.ExpireDate = expireDate;
+
+                SendEmail(guid, invitation.Email);
+
+                _context.Invitations.Add(newInvitation);
+                _context.SaveChanges();
+
+                SendEmail(guid,invitation.Email);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+
+            return Ok(invitation);
+        }
+
+        private void SendEmail(Guid guid,string email)
+        {
+            var message = new Message(new string[] { email }, "Cod Invitatie", guid.ToString());
+            _emailSender.SendEmail(message);
         }
     }
 }

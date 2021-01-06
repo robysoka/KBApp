@@ -12,6 +12,10 @@ namespace KBDataAccessLibrary.Models.RegisterModels
         [Key]
         public Guid InvitationString { get; set; }
 
+        [Required]
+        [EmailAddress]
+        public string Email{ get; set; }
+
         public string Belt { get; set; }
 
         [Required]
