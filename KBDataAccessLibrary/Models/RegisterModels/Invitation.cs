@@ -11,6 +11,7 @@ namespace KBDataAccessLibrary.Models.RegisterModels
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public Guid InvitationString { get; set; }
+
         public string Belt { get; set; }
 
         [Required]

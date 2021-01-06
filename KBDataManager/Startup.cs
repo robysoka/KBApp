@@ -46,7 +46,7 @@ namespace KBDataManager
             services.AddScoped<IEmailSender, EmailSender>();
 
             //Email Service
-            var emailConfig = Configuration.
+            var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
             services.AddSingleton(emailConfig);
