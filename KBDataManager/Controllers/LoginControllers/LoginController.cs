@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using KBDataAccessLibrary.DataAccess;
+using KBDataAccessLibrary.Models;
 using KBDataAccessLibrary.Models.LoginModels;
 using KBDataAccessLibrary.Models.RegisterModels;
 using KBDataManager.EmailService;
@@ -22,15 +23,21 @@ namespace KBDataManager.Controllers.LoginControllers
     {
         private readonly KBContext _context;
         private readonly IEmailSender _emailSender;
-        public LoginController(KBContext context, IEmailSender emailSender)
+        private readonly IMapper _mapper;
+        public LoginController(KBContext context, IEmailSender emailSender,IMapper mapper)
         {
             _context = context;
             _emailSender = emailSender;
+            _mapper = mapper;
+
         }
 
 
         //LOGIN
         [HttpPost, Route("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Login([FromBody] UserInputModel userInputModel)
         {
             if (userInputModel == null)
@@ -79,6 +86,8 @@ namespace KBDataManager.Controllers.LoginControllers
 
         //REGISTER-INVITATION
         [HttpPost, Route("invitation")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult PostInvitation([FromBody] InvitationInputModel invitation)
         {
             Invitation newInvitation = new Invitation();
@@ -91,26 +100,16 @@ namespace KBDataManager.Controllers.LoginControllers
                 newInvitation.Belt = invitation.Belt;
                 newInvitation.Email = invitation.Email;
 
-                newInvitation.AgeCategory = _context.AgeCategories.Find(invitation.AgeCategoryId);
-                if (newInvitation.AgeCategory == null)
-                {
-                    return BadRequest();
-                }
-
-                newInvitation.Group = _context.Groups.Find(invitation.GroupId);
-                if (newInvitation.Group == null)
-                {
-                    return BadRequest();
-                }
+                newInvitation.AgeCategory = invitation.AgeCategoryId;
+                newInvitation.Group = invitation.GroupId;
 
                 newInvitation.ExpireDate = expireDate;
-
-                SendEmail(guid, invitation.Email);
 
                 _context.Invitations.Add(newInvitation);
                 _context.SaveChanges();
 
-                SendEmail(guid,invitation.Email);
+                SendEmail(guid, invitation.Email);
+
             }
             catch (Exception e)
             {
@@ -125,5 +124,41 @@ namespace KBDataManager.Controllers.LoginControllers
             var message = new Message(new string[] { email }, "Cod Invitatie", guid.ToString());
             _emailSender.SendEmail(message);
         }
+
+        //REGISTER - STUDENT
+        [HttpPost, Route("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Register([FromBody] UserRegistrationInputModel userRegistration)
+        {
+            var invitation = _context.Invitations.Find(userRegistration.InvitationString);
+
+            if (invitation == null)
+            {
+                return BadRequest("Invalid Invitation Code");
+            }
+
+            var newUser = _mapper.Map<UserRegistrationInputModel, User>(userRegistration);
+            if (newUser.Role == null)
+            {
+                newUser.Role = "client";
+            }
+            //_context.Users.Add(newUser);
+
+            var newStudent = new Student()
+            {
+                LastName = userRegistration.LastName,
+                FirstName = userRegistration.FirstName,
+                BirthDate = userRegistration.BirthDate,
+                Belt = invitation.Belt,
+                AgeCategory = _context.AgeCategories.Find(invitation.AgeCategory),
+                Group = _context.Groups.Find(invitation.Group),
+                User = newUser
+            };
+
+            return Ok(newStudent);
+        }
+
+
     }
 }

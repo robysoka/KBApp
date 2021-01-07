@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using KBDataAccessLibrary.Models;
+using KBDataAccessLibrary.Models.LoginModels;
 using KBDataAccessLibrary.Models.RegisterModels;
 using KBDataManager.ViewModels;
 using System;
@@ -15,6 +16,10 @@ namespace KBDataManager.Mapping
         {
             CreateMap<AgeCategory, AgeCategoryViewModel>()
                 .ReverseMap();
+
+            CreateMap<UserRegistrationInputModel, User>()
+                .ReverseMap();
+
         }
     }
 }
