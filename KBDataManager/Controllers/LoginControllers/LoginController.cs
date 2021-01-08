@@ -144,11 +144,12 @@ namespace KBDataManager.Controllers.LoginControllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Register([FromBody] UserRegistrationInputModel userRegistration)
         {
-          
-            var invitation = _context.Set<Invitation>()
+
+            var invitation = _context.Invitations
+                .Where(i => i.InvitationString == userRegistration.InvitationString)
                 .Include("AgeCategory")
                 .Include("Group")
-                .First();
+                .FirstOrDefault();
 
 
             if (invitation == null)
@@ -161,7 +162,7 @@ namespace KBDataManager.Controllers.LoginControllers
             {
                 newUser.Role = "client";
             }
-            _context.Users.Add(newUser);
+            //_context.Users.Add(newUser);
 
             var newStudent = _mapper.Map<UserRegistrationInputModel, Student>(userRegistration);
             newStudent.Belt = invitation.Belt;
@@ -169,8 +170,10 @@ namespace KBDataManager.Controllers.LoginControllers
             newStudent.Group = invitation.Group;
             newStudent.User = newUser;
 
-            _context.Students.Add(newStudent);
+            //_context.Students.Add(newStudent);
 
+            //_context.SaveChanges();
+            //TODO: TRY CATCH + verificare functionare
             return Ok(newStudent);
         }
 
