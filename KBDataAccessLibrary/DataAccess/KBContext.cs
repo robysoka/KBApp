@@ -10,7 +10,10 @@ namespace KBDataAccessLibrary.DataAccess
 {
     public class KBContext : DbContext
     {
-        public KBContext(DbContextOptions options) : base(options) { }
+        public KBContext(DbContextOptions options) : base(options) 
+        {
+            //this.ChangeTracker.LazyLoadingEnabled = false;
+        }
         public DbSet<AgeCategory> AgeCategories { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Class> Classes { get; set; }

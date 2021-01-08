@@ -16,10 +16,10 @@ namespace KBDataAccessLibrary.Models
         public DateTime EndTime { get; set; }
 
         [Required]
-        public AgeCategory AgeCategory { get; set; }
+        virtual public AgeCategory AgeCategory { get; set; }
 
         [Required]
-        public Group Group { get; set; }
+        virtual public Group Group { get; set; }
         public List<Instructor> Instructors { get; set; }
     }
 }

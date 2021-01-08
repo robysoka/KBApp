@@ -16,7 +16,7 @@ namespace KBDataAccessLibrary.Models
         public string GroupName { get; set; }
         
         [Required]
-        public AgeCategory AgeCategory { get; set; }
+        virtual public AgeCategory AgeCategory { get; set; }
         public List<Student> Students { get; set; }
     }
 }

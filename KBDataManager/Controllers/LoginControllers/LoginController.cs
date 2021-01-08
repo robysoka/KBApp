@@ -6,6 +6,7 @@ using KBDataAccessLibrary.Models.RegisterModels;
 using KBDataManager.EmailService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -100,8 +101,20 @@ namespace KBDataManager.Controllers.LoginControllers
                 newInvitation.Belt = invitation.Belt;
                 newInvitation.Email = invitation.Email;
 
-                newInvitation.AgeCategory = invitation.AgeCategoryId;
-                newInvitation.Group = invitation.GroupId;
+                var ageCategory = _context.AgeCategories.Find(invitation.AgeCategoryId);
+                if (ageCategory == null)
+                {
+                    return BadRequest();
+                }
+
+                var group = _context.Groups.Find(invitation.GroupId);
+                if (group == null)
+                {
+                    return BadRequest();
+                }
+
+                newInvitation.AgeCategory = ageCategory;
+                newInvitation.Group = group;
 
                 newInvitation.ExpireDate = expireDate;
 
@@ -116,7 +129,7 @@ namespace KBDataManager.Controllers.LoginControllers
                 return BadRequest(e);
             }
 
-            return Ok(invitation);
+            return Ok(newInvitation);
         }
 
         private void SendEmail(Guid guid,string email)
@@ -131,7 +144,12 @@ namespace KBDataManager.Controllers.LoginControllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Register([FromBody] UserRegistrationInputModel userRegistration)
         {
-            var invitation = _context.Invitations.Find(userRegistration.InvitationString);
+          
+            var invitation = _context.Set<Invitation>()
+                .Include("AgeCategory")
+                .Include("Group")
+                .First();
+
 
             if (invitation == null)
             {
@@ -143,18 +161,15 @@ namespace KBDataManager.Controllers.LoginControllers
             {
                 newUser.Role = "client";
             }
-            //_context.Users.Add(newUser);
+            _context.Users.Add(newUser);
 
-            var newStudent = new Student()
-            {
-                LastName = userRegistration.LastName,
-                FirstName = userRegistration.FirstName,
-                BirthDate = userRegistration.BirthDate,
-                Belt = invitation.Belt,
-                AgeCategory = _context.AgeCategories.Find(invitation.AgeCategory),
-                Group = _context.Groups.Find(invitation.Group),
-                User = newUser
-            };
+            var newStudent = _mapper.Map<UserRegistrationInputModel, Student>(userRegistration);
+            newStudent.Belt = invitation.Belt;
+            newStudent.AgeCategory = invitation.AgeCategory;
+            newStudent.Group = invitation.Group;
+            newStudent.User = newUser;
+
+            _context.Students.Add(newStudent);
 
             return Ok(newStudent);
         }

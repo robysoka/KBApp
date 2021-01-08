@@ -16,6 +16,6 @@ namespace KBDataAccessLibrary.Models
         public DateTime ExpireTime { get; set; }
 
         [Required]
-        public Student Student { get; set; }
+        virtual public Student Student { get; set; }
     }
 }

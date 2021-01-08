@@ -10,7 +10,7 @@ namespace KBDataAccessLibrary.Models
         public int AttendanceId { get; set; }
 
         [Required]
-        public Student Student { get; set; }
+        virtual public Student Student { get; set; }
 
         [Required]
         public Class Class { get; set; }

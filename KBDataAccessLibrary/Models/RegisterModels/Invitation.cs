@@ -19,12 +19,12 @@ namespace KBDataAccessLibrary.Models.RegisterModels
         public string Belt { get; set; }
 
         [Required]
-        public AgeCategory AgeCategory { get; set; }
+        virtual public AgeCategory AgeCategory { get; set; }
 
         [Required]
-        public Group Group { get; set; }
+        virtual public Group Group { get; set; }
         
-        [Required]
+        //[Required]
         public DateTime ExpireDate { get; set; }
     }
 }
