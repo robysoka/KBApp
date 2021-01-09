@@ -22,6 +22,5 @@ namespace KBDataAccessLibrary.DataAccess
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Invitation> Invitations { get; set; }
     }
 }

@@ -25,7 +25,7 @@ namespace KBDataManager.Controllers.LoginControllers
         private readonly KBContext _context;
         private readonly IEmailSender _emailSender;
         private readonly IMapper _mapper;
-        public LoginController(KBContext context, IEmailSender emailSender,IMapper mapper)
+        public LoginController(KBContext context, IEmailSender emailSender, IMapper mapper)
         {
             _context = context;
             _emailSender = emailSender;
@@ -84,99 +84,63 @@ namespace KBDataManager.Controllers.LoginControllers
             return _context.Users.Find(Username);
         }
 
-
-        //REGISTER-INVITATION
+        //INVITATION CODE ENCTYPTION
         [HttpPost, Route("invitation")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult PostInvitation([FromBody] InvitationInputModel invitation)
+        public IActionResult Invitaion([FromBody] string email)
         {
-            Invitation newInvitation = new Invitation();
-            var guid = Guid.NewGuid();
-            var expireDate = DateTime.Now.AddDays(3);
+            Random generator = new Random();
+            String invitationCode = generator.Next(100000, 1000000).ToString("D6");
 
-            try
-            {
-                newInvitation.InvitationString = guid;
-                newInvitation.Belt = invitation.Belt;
-                newInvitation.Email = invitation.Email;
-
-                var ageCategory = _context.AgeCategories.Find(invitation.AgeCategoryId);
-                if (ageCategory == null)
-                {
-                    return BadRequest();
-                }
-
-                var group = _context.Groups.Find(invitation.GroupId);
-                if (group == null)
-                {
-                    return BadRequest();
-                }
-
-                newInvitation.AgeCategory = ageCategory;
-                newInvitation.Group = group;
-
-                newInvitation.ExpireDate = expireDate;
-
-                _context.Invitations.Add(newInvitation);
-                _context.SaveChanges();
-
-                SendEmail(guid, invitation.Email);
-
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
-
-            return Ok(newInvitation);
+            string invitationHash = BCrypt.Net.BCrypt.HashPassword(invitationCode);
+            SendEmailInvitation(email, invitationCode);
+            return Ok(invitationHash);
         }
 
-        private void SendEmail(Guid guid,string email)
+        private void SendEmailInvitation(string email, String invitationCode)
         {
-            var message = new Message(new string[] { email }, "Cod Invitatie", guid.ToString());
+            var message = new Message(new string[] { email }, "Cod Invitatie", invitationCode);
             _emailSender.SendEmail(message);
         }
 
-        //REGISTER - STUDENT
+        //REGISTER
         [HttpPost, Route("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult Register([FromBody] UserRegistrationInputModel userRegistration)
         {
-
-            var invitation = _context.Invitations
-                .Where(i => i.InvitationString == userRegistration.InvitationString)
-                .Include("AgeCategory")
-                .Include("Group")
-                .FirstOrDefault();
-
-
-            if (invitation == null)
+            bool verified = BCrypt.Net.BCrypt.Verify(userRegistration.InvitationCode, userRegistration.InvitationHash);
+            if (!verified)
             {
-                return BadRequest("Invalid Invitation Code");
+                return Forbid();
             }
-
-            var newUser = _mapper.Map<UserRegistrationInputModel, User>(userRegistration);
-            if (newUser.Role == null)
+            else
             {
-                newUser.Role = "client";
+
+                var newUser = _mapper.Map<UserRegistrationInputModel, User>(userRegistration);
+                if (newUser.Role == null)
+                {
+                    newUser.Role = "client";
+                }
+                _context.Users.Add(newUser);
+
+                var newStudent = _mapper.Map<UserRegistrationInputModel, Student>(userRegistration);
+                newStudent.User = newUser;
+                _context.Students.Add(newStudent);
+
+                _context.SaveChanges();
+
+                var name = userRegistration.LastName + " " + userRegistration.FirstName;
+                SendEmailConfirmation(userRegistration.Username, name);
+
+                return Ok();
             }
-            //_context.Users.Add(newUser);
-
-            var newStudent = _mapper.Map<UserRegistrationInputModel, Student>(userRegistration);
-            newStudent.Belt = invitation.Belt;
-            newStudent.AgeCategory = invitation.AgeCategory;
-            newStudent.Group = invitation.Group;
-            newStudent.User = newUser;
-
-            //_context.Students.Add(newStudent);
-
-            //_context.SaveChanges();
-            //TODO: TRY CATCH + verificare functionare
-            return Ok(newStudent);
         }
 
-
+        private void SendEmailConfirmation(string email, string name)
+        {
+            var message = new Message(new string[] { email }, "Confirmare solicitare", "Solicitarea pentru studentul " + name +" a fost trimisa" );
+            _emailSender.SendEmail(message);
+        }
     }
 }

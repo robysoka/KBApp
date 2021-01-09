@@ -18,5 +18,8 @@ namespace KBDataAccessLibrary.Models.LoginModels
 
         [Required]
         public string Role { get; set; }
+
+        [Required]
+        public bool IsVerified { get; set; }
     }
 }

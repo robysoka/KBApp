@@ -7,8 +7,14 @@ namespace KBDataAccessLibrary.Models.RegisterModels
 {
     public class UserRegistrationInputModel
     {
+
+        //FROM FRONTEND CLIENT
         [Required]
-        public Guid InvitationString { get; set; }
+        public string InvitationHash { get; set; }
+
+        //FROM USER
+        [Required]
+        public string InvitationCode { get; set; }
 
         [Required]
         public string LastName { get; set; }
@@ -26,6 +32,12 @@ namespace KBDataAccessLibrary.Models.RegisterModels
         [Required]
         [MinLength(6)]
         public string Password { get; set; }
+
+        [Required]
+        public AgeCategory AgeCategory { get; set; }
+
+        [Required]
+        public Group Group { get; set; }
 
     }
 }
