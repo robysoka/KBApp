@@ -4,14 +4,16 @@ using KBDataAccessLibrary.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KBDataAccessLibrary.Migrations
 {
     [DbContext(typeof(KBContext))]
-    partial class KBContextModelSnapshot : ModelSnapshot
+    [Migration("20210111212851_FKupdateInStudentsModel")]
+    partial class FKupdateInStudentsModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,10 +60,10 @@ namespace KBDataAccessLibrary.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("ClassId")
+                    b.Property<int?>("ClassId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("int");
 
                     b.HasKey("AttendanceId");
@@ -80,16 +82,21 @@ namespace KBDataAccessLibrary.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int?>("AgeCategoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("ClassId");
+
+                    b.HasIndex("AgeCategoryId");
 
                     b.HasIndex("GroupId");
 
@@ -103,7 +110,7 @@ namespace KBDataAccessLibrary.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("AgeCategoryId")
+                    b.Property<int?>("AgeCategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("GroupName")
@@ -192,6 +199,9 @@ namespace KBDataAccessLibrary.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int>("AgeCategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Belt")
                         .HasColumnType("nvarchar(max)");
 
@@ -216,6 +226,8 @@ namespace KBDataAccessLibrary.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("StudentId");
+
+                    b.HasIndex("AgeCategoryId");
 
                     b.HasIndex("GroupId");
 
@@ -243,15 +255,11 @@ namespace KBDataAccessLibrary.Migrations
                 {
                     b.HasOne("KBDataAccessLibrary.Models.Class", "Class")
                         .WithMany()
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClassId");
 
                     b.HasOne("KBDataAccessLibrary.Models.Student", "Student")
                         .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StudentId");
 
                     b.Navigation("Class");
 
@@ -260,11 +268,15 @@ namespace KBDataAccessLibrary.Migrations
 
             modelBuilder.Entity("KBDataAccessLibrary.Models.Class", b =>
                 {
+                    b.HasOne("KBDataAccessLibrary.Models.AgeCategory", "AgeCategory")
+                        .WithMany()
+                        .HasForeignKey("AgeCategoryId");
+
                     b.HasOne("KBDataAccessLibrary.Models.Group", "Group")
                         .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GroupId");
+
+                    b.Navigation("AgeCategory");
 
                     b.Navigation("Group");
                 });
@@ -272,10 +284,8 @@ namespace KBDataAccessLibrary.Migrations
             modelBuilder.Entity("KBDataAccessLibrary.Models.Group", b =>
                 {
                     b.HasOne("KBDataAccessLibrary.Models.AgeCategory", "AgeCategory")
-                        .WithMany("Groups")
-                        .HasForeignKey("AgeCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("AgeCategoryId");
 
                     b.Navigation("AgeCategory");
                 });
@@ -293,6 +303,12 @@ namespace KBDataAccessLibrary.Migrations
 
             modelBuilder.Entity("KBDataAccessLibrary.Models.Student", b =>
                 {
+                    b.HasOne("KBDataAccessLibrary.Models.AgeCategory", "AgeCategory")
+                        .WithMany("Students")
+                        .HasForeignKey("AgeCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("KBDataAccessLibrary.Models.Group", "Group")
                         .WithMany("Students")
                         .HasForeignKey("GroupId")
@@ -305,6 +321,8 @@ namespace KBDataAccessLibrary.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("AgeCategory");
+
                     b.Navigation("Group");
 
                     b.Navigation("User");
@@ -312,7 +330,7 @@ namespace KBDataAccessLibrary.Migrations
 
             modelBuilder.Entity("KBDataAccessLibrary.Models.AgeCategory", b =>
                 {
-                    b.Navigation("Groups");
+                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("KBDataAccessLibrary.Models.Group", b =>

@@ -4,6 +4,7 @@ using KBDataAccessLibrary.Models;
 using KBDataAccessLibrary.Models.LoginModels;
 using KBDataAccessLibrary.Models.RegisterModels;
 using KBDataManager.EmailService;
+using KBDataManager.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -59,8 +60,8 @@ namespace KBDataManager.Controllers.LoginControllers
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, userInputModel.Username),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim("username", userInputModel.Username),
+                    new Claim("role", user.Role)
                 };
 
                 var tokenOptions = new JwtSecurityToken(
@@ -87,13 +88,15 @@ namespace KBDataManager.Controllers.LoginControllers
         //INVITATION CODE ENCTYPTION
         [HttpPost, Route("invitation")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Invitaion([FromBody] string email)
+        public IActionResult Invitaion([FromBody]InvitationInputModel email)
         {
             Random generator = new Random();
             String invitationCode = generator.Next(100000, 1000000).ToString("D6");
+            string hash = BCrypt.Net.BCrypt.HashPassword(invitationCode);
+            SendEmailInvitation(email.Email, invitationCode);
 
-            string invitationHash = BCrypt.Net.BCrypt.HashPassword(invitationCode);
-            SendEmailInvitation(email, invitationCode);
+            InvitationHash invitationHash = new InvitationHash();
+            invitationHash.Hash=hash;
             return Ok(invitationHash);
         }
 
@@ -109,31 +112,41 @@ namespace KBDataManager.Controllers.LoginControllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult Register([FromBody] UserRegistrationInputModel userRegistration)
         {
-            bool verified = BCrypt.Net.BCrypt.Verify(userRegistration.InvitationCode, userRegistration.InvitationHash);
-            if (!verified)
-            {
-                return Forbid();
-            }
-            else
+            try
             {
 
-                var newUser = _mapper.Map<UserRegistrationInputModel, User>(userRegistration);
-                if (newUser.Role == null)
+                bool verified = BCrypt.Net.BCrypt.Verify(userRegistration.InvitationCode, userRegistration.InvitationHash);
+                if (!verified)
                 {
-                    newUser.Role = "client";
+                    return Forbid();
                 }
-                _context.Users.Add(newUser);
+                else
+                {
 
-                var newStudent = _mapper.Map<UserRegistrationInputModel, Student>(userRegistration);
-                newStudent.User = newUser;
-                _context.Students.Add(newStudent);
+                    var newUser = _mapper.Map<UserRegistrationInputModel, User>(userRegistration);
+                    if (newUser.Role == null)
+                    {
+                        newUser.Role = "client";
+                    }
+                    _context.Users.Add(newUser);
 
-                _context.SaveChanges();
+                    var newStudent = _mapper.Map<UserRegistrationInputModel, Student>(userRegistration);
+                    newStudent.GroupId = userRegistration.GroupId;
+                    newStudent.User = newUser;
+                    _context.Students.Add(newStudent);
 
-                var name = userRegistration.LastName + " " + userRegistration.FirstName;
-                SendEmailConfirmation(userRegistration.Username, name);
+                    _context.SaveChanges();
 
-                return Ok();
+                    var name = userRegistration.LastName + " " + userRegistration.FirstName;
+
+                    //SendEmailConfirmation(userRegistration.Username, name);
+
+                    return Ok();
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
             }
         }
 
@@ -141,6 +154,62 @@ namespace KBDataManager.Controllers.LoginControllers
         {
             var message = new Message(new string[] { email }, "Confirmare solicitare", "Solicitarea pentru studentul " + name +" a fost trimisa" );
             _emailSender.SendEmail(message);
+        }
+
+
+        //USER CONFIRMATION
+        [HttpPut, Route("confirm/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult userConfirm(string username)
+        {
+            var user = _context.Users.Find(username);
+
+            if (user == null)
+            {
+                return NotFound("There is no user with the specifed username");
+            }
+
+            if(user.IsVerified == true)
+            {
+                return BadRequest("User already validated");
+            }
+           
+            user.IsVerified = true;
+            _context.Entry(user).State = EntityState.Modified;
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch(DbUpdateConcurrencyException e)
+            {
+                return BadRequest(e.Message);
+            }
+            return Ok();
+        }
+
+        [HttpDelete, Route("reject/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult userReject(string username)
+        {
+            var user = _context.Users.Find(username);
+
+            if (user == null)
+            {
+                return NotFound("There is no user with the specifed username");
+            }
+
+            if (user.IsVerified == true)
+            {
+                return BadRequest("User already validated");
+            }
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

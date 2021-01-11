@@ -8,6 +8,7 @@ namespace KBDataAccessLibrary.Models.LoginModels
     public class User
     {
         [Key]
+        [Required]
         [EmailAddress]
         public string Username { get; set; }
 

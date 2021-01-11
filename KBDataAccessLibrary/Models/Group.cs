@@ -15,8 +15,13 @@ namespace KBDataAccessLibrary.Models
         [Column(TypeName ="varchar(15)")]
         public string GroupName { get; set; }
         
+    
         [Required]
+        [ForeignKey("AgeCategory")]
+        public int AgeCategoryId { get; set; }
         virtual public AgeCategory AgeCategory { get; set; }
+
+
         public List<Student> Students { get; set; }
     }
 }

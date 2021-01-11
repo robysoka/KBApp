@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace KBDataAccessLibrary.Models
@@ -15,10 +16,10 @@ namespace KBDataAccessLibrary.Models
         [Required]
         public DateTime EndTime { get; set; }
 
-        [Required]
-        virtual public AgeCategory AgeCategory { get; set; }
 
         [Required]
+        [ForeignKey("Group")]
+        public int GroupId { get; set; }
         virtual public Group Group { get; set; }
         public List<Instructor> Instructors { get; set; }
     }

@@ -26,6 +26,9 @@ namespace KBDataAccessLibrary.Models.RegisterModels
         public DateTime BirthDate { get; set; }
 
         [Required]
+        public string Belt { get; set; }
+
+        [Required]
         [EmailAddress]
         public string Username { get; set; }
 
@@ -34,10 +37,7 @@ namespace KBDataAccessLibrary.Models.RegisterModels
         public string Password { get; set; }
 
         [Required]
-        public AgeCategory AgeCategory { get; set; }
-
-        [Required]
-        public Group Group { get; set; }
+        public int GroupId { get; set; }
 
     }
 }

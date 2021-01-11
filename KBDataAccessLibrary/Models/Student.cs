@@ -27,13 +27,15 @@ namespace KBDataAccessLibrary.Models
         public string Belt { get; set; }
 
         [Required]
-        virtual public AgeCategory AgeCategory { get; set; }
-
-        [Required]
+        [ForeignKey("Group")]
+        public int GroupId { get; set; }
         virtual public Group Group { get; set; }
 
         [Required]
+        [ForeignKey("User")]
+        public string Username { get; set; }
         virtual public User User { get; set; }
+
 
         public List<Membership> Memberships { get; set; }
     }
