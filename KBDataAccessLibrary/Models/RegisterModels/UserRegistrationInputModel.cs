@@ -25,7 +25,6 @@ namespace KBDataAccessLibrary.Models.RegisterModels
         [Required]
         public DateTime BirthDate { get; set; }
 
-        [Required]
         public string Belt { get; set; }
 
         [Required]

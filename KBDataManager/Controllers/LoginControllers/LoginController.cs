@@ -90,14 +90,22 @@ namespace KBDataManager.Controllers.LoginControllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Invitaion([FromBody]InvitationInputModel email)
         {
-            Random generator = new Random();
-            String invitationCode = generator.Next(100000, 1000000).ToString("D6");
-            string hash = BCrypt.Net.BCrypt.HashPassword(invitationCode);
-            SendEmailInvitation(email.Email, invitationCode);
+            //TODO: Check if username with the email already exists
+            try
+            {
+                Random generator = new Random();
+                String invitationCode = generator.Next(100000, 1000000).ToString("D6");
+                string hash = BCrypt.Net.BCrypt.HashPassword(invitationCode);
+                SendEmailInvitation(email.Email, invitationCode);
 
-            InvitationHash invitationHash = new InvitationHash();
-            invitationHash.Hash=hash;
-            return Ok(invitationHash);
+                InvitationHash invitationHash = new InvitationHash();
+                invitationHash.Hash = hash;
+                return Ok(invitationHash);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         private void SendEmailInvitation(string email, String invitationCode)
@@ -126,11 +134,15 @@ namespace KBDataManager.Controllers.LoginControllers
                     var newUser = _mapper.Map<UserRegistrationInputModel, User>(userRegistration);
                     if (newUser.Role == null)
                     {
-                        newUser.Role = "client";
+                        newUser.Role = "USER";
                     }
                     _context.Users.Add(newUser);
 
                     var newStudent = _mapper.Map<UserRegistrationInputModel, Student>(userRegistration);
+                    if(newStudent.Belt == null)
+                    {
+                        newStudent.Belt = "alb";
+                    }
                     newStudent.GroupId = userRegistration.GroupId;
                     newStudent.User = newUser;
                     _context.Students.Add(newStudent);
@@ -139,7 +151,7 @@ namespace KBDataManager.Controllers.LoginControllers
 
                     var name = userRegistration.LastName + " " + userRegistration.FirstName;
 
-                    //SendEmailConfirmation(userRegistration.Username, name);
+                    SendEmailConfirmation(userRegistration.Username, name);
 
                     return Ok();
                 }
@@ -158,6 +170,7 @@ namespace KBDataManager.Controllers.LoginControllers
 
 
         //USER CONFIRMATION
+        //CONFIRM
         [HttpPut, Route("confirm/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -189,6 +202,7 @@ namespace KBDataManager.Controllers.LoginControllers
             return Ok();
         }
 
+        //REJECT
         [HttpDelete, Route("reject/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
