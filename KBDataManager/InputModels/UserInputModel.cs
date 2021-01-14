@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace KBDataAccessLibrary.Models.LoginModels
+namespace KBDataManager.InputModels
 {
     public class UserInputModel
     {

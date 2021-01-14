@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace KBDataAccessLibrary.Models.RegisterModels
+namespace KBDataManager.InputModels
 {
     public class UserRegistrationInputModel
     {

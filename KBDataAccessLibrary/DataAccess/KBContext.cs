@@ -1,10 +1,5 @@
 ﻿using KBDataAccessLibrary.Models;
-using KBDataAccessLibrary.Models.LoginModels;
-using KBDataAccessLibrary.Models.RegisterModels;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace KBDataAccessLibrary.DataAccess
 {

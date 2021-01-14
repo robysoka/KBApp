@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using KBDataAccessLibrary.DataAccess;
 using KBDataAccessLibrary.Models;
-using KBDataAccessLibrary.Models.LoginModels;
-using KBDataAccessLibrary.Models.RegisterModels;
 using KBDataManager.EmailService;
+using KBDataManager.InputModels;
 using KBDataManager.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace KBDataManager.Controllers.LoginControllers
 {

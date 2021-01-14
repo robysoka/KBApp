@@ -1,12 +1,7 @@
 ﻿using AutoMapper;
 using KBDataAccessLibrary.Models;
-using KBDataAccessLibrary.Models.LoginModels;
-using KBDataAccessLibrary.Models.RegisterModels;
+using KBDataManager.InputModels;
 using KBDataManager.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace KBDataManager.Mapping
 {

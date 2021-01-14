@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace KBDataAccessLibrary.Models.LoginModels
+namespace KBDataAccessLibrary.Models
 {
     public class User
     {

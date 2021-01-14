@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace KBDataAccessLibrary.Models.RegisterModels
+namespace KBDataManager.InputModels
 {
     public class InvitationInputModel
     {
