@@ -89,7 +89,6 @@ namespace KBDataManager.Controllers
                 return BadRequest(e);
             }
 
-            //TODO: Ce este mai bine sa returnez cu Response Code-ul?
             return Ok(ageCategoryViewModel);
         }
 
