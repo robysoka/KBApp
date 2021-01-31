@@ -13,9 +13,11 @@ namespace KBDataAccessLibrary.Repository
         {
             _context = context;
             AgeCategories = new AgeCategoryRepository(_context);
+            Groups = new GroupRepository(_context);
         }
 
         public IAgeCategoryRepository AgeCategories { get; private set; }
+        public IGroupRepository Groups  { get; private set; }
 
         public async Task<int> Complete()
         {

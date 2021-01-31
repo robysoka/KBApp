@@ -8,6 +8,9 @@ namespace KBDataAccessLibrary.Repository
     public interface IUnitOfWork : IDisposable
     {
         IAgeCategoryRepository AgeCategories { get; }
+
+        IGroupRepository Groups { get; }
+
         Task<int> Complete();
     }
 }

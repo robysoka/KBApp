@@ -31,7 +31,7 @@ namespace KBDataManager.Controllers
         /// <returns>All Age Categories</returns>
         /// <response code="200"> Returns All Age Categories</response>
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<AgeCategory>>> GetAgeCategories()
         {

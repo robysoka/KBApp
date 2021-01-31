@@ -18,6 +18,9 @@ namespace KBDataManager.Mapping
             CreateMap<UserRegistrationInputModel, Student>()
                 .ReverseMap();
 
+            CreateMap<Group, GroupViewModel>()
+                .ReverseMap();
+
         }
     }
 }
