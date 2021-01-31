@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KBDataAccessLibrary.DataAccess;
 using KBDataAccessLibrary.Models;
+using AutoMapper;
+using KBDataManager.ViewModels;
 
 namespace KBDataManager.Controllers
 {
@@ -15,10 +17,12 @@ namespace KBDataManager.Controllers
     public class StudentsController : ControllerBase
     {
         private readonly KBContext _context;
+        private readonly IMapper _mapper;
 
-        public StudentsController(KBContext context)
+        public StudentsController(KBContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Students
@@ -28,18 +32,19 @@ namespace KBDataManager.Controllers
             return await _context.Students.ToListAsync();
         }
 
-        // GET: api/Students/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Student>> GetStudent(int id)
+        // GET: api/Students/{Username}
+        [HttpGet("{Username}")]
+        public async Task<ActionResult<StudentDataViewModel>> GetStudent(string Username)
         {
-            var student = await _context.Students.FindAsync(id);
+            var student = await _context.Students.FirstOrDefaultAsync(st => st.Username == Username);
 
             if (student == null)
             {
                 return NotFound();
             }
 
-            return student;
+            var studentView= _mapper.Map<Student, StudentDataViewModel>(student);
+            return studentView;
         }
 
         // PUT: api/Students/5

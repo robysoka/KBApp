@@ -4,14 +4,16 @@ using KBDataAccessLibrary.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KBDataAccessLibrary.Migrations
 {
     [DbContext(typeof(KBContext))]
-    partial class KBContextModelSnapshot : ModelSnapshot
+    [Migration("20210131125457_BirthDate_typ")]
+    partial class BirthDate_typ
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,10 +115,10 @@ namespace KBDataAccessLibrary.Migrations
                         .HasColumnType("nvarchar(250)");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("Date");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("Date");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("CompetitionId");
 

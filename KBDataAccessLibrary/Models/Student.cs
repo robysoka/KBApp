@@ -20,6 +20,7 @@ namespace KBDataAccessLibrary.Models
         public string FirstName { get; set; }
 
         [Required]
+        [Column(TypeName = "Date")]
         public DateTime BirthDate { get; set; }
 
         public string Belt { get; set; }

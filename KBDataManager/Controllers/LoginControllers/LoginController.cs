@@ -184,7 +184,7 @@ namespace KBDataManager.Controllers.LoginControllers
 
         private void SendEmailConfirmation(string email, string name)
         {
-            var message = new Message(new string[] { email }, "Confirmare solicitare", "Solicitarea pentru studentul " + name +" a fost trimisa" );
+            var message = new Message(new string[] { email }, "Confirmare solicitare", "Contul pentru " + name +" a fost creat" );
             _emailSender.SendEmail(message);
         }
 

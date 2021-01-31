@@ -20,7 +20,8 @@ namespace KBDataManager.Mapping
 
             CreateMap<Group, GroupViewModel>()
                 .ReverseMap();
-
+            CreateMap<Student, StudentDataViewModel>()
+                .ReverseMap();
         }
     }
 }
